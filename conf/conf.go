@@ -37,7 +37,7 @@ func (a *AppConf) UpdateFileId(fileId int) error {
 	defer rwMutex.Unlock()
 
 	// 持久化到配置文件
-	f1, err := os.OpenFile("../jwzx-mail/conf/conf.json", os.O_RDWR|os.O_TRUNC, 0666)
+	f1, err := os.OpenFile("../conf/conf.json", os.O_RDWR|os.O_TRUNC, 0666)
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func (a *AppConf) UpdateFileId(fileId int) error {
 
 // 读取配置文件
 func init() {
-	f, err := os.OpenFile("../jwzx-mail/conf/conf.json", os.O_RDONLY, os.ModePerm)
+	f, err := os.OpenFile("../conf/conf.json", os.O_RDONLY, os.ModePerm)
 	if err != nil {
 		log.Println(err)
 		panic(err)
