@@ -38,7 +38,7 @@ func NewClient() *Client {
 // SendHtmlWithAttachments 使用前，先将html和附件填充好
 func (c *Client) SendHtmlWithAttachments(e *email.Email) error {
 	log.Println("	正在发送邮件...")
-	return c.EPool.Send(e, time.Second*20)
+	return c.EPool.Send(e, time.Second*3)
 }
 
 var ErrEmptyMailHeader = errors.New("empty `from` or `tos`")

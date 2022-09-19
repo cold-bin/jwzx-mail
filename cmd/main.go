@@ -4,6 +4,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/jordan-wright/email"
 	"jwzx-mail/conf"
 	"jwzx-mail/logic"
@@ -11,7 +12,8 @@ import (
 	"jwzx-mail/model"
 	"jwzx-mail/util"
 	"log"
-	"sync"
+	"os"
+	"runtime"
 )
 
 func init() {
@@ -19,7 +21,8 @@ func init() {
 }
 
 func main() {
-	if err := do(); err != nil {
+	news, err := logic.GetNewNews()
+	if err != nil {
 		if err == logic.ErrNotTheLatest {
 			log.Println("当前无新通知")
 			return
@@ -27,17 +30,10 @@ func main() {
 		log.Println("err: ", err)
 		return
 	}
-	log.Println("爬取成功")
-}
 
-func do() error {
-	news, err := logic.GetNewNews()
-	if err != nil {
-		return err
-	}
 	log.Println("一共有", len(news), "条新消息")
 	if len(news) == 0 {
-		return nil
+		return
 	}
 
 	// 然后把邮件发出去
@@ -56,7 +52,7 @@ func do() error {
 		}
 	}()
 
-	var wg sync.WaitGroup
+	//var wg sync.WaitGroup
 	for i, v := range news {
 		//TODO: 原版非并发，顺序执行
 		//log.Println("爬取消息 -> ", v.Title)
@@ -73,44 +69,54 @@ func do() error {
 		//if err = client.SendHtmlWithAttachments(e); err != nil {
 		//	 return err
 		//}
-		wg.Add(1)
-
+		//wg.Add(1)
 		if i == 0 {
 			go func(v model.NewsContent, client mail.Client, i int) {
-				err := constructAndSend(v, client)
-				if err != nil {
+				fmt.Println("i=", i)
+				if err := constructAndSend(v, client); err != nil {
 					log.Println("有一封邮件发送出错：", err)
 				}
-				wg.Done()
+
+				//wg.Done()
 				chans[i] <- struct{}{}
 
 			}(v, *client, i)
 		} else if i == len(news)-1 {
 			go func(v model.NewsContent, client mail.Client, i int) {
+				fmt.Println("i=", i)
 				<-chans[i-1]
-				err := constructAndSend(v, client)
-				if err != nil {
+				if err := constructAndSend(v, client); err != nil {
 					log.Println("有一封邮件发送出错：", err)
 				}
-				wg.Done()
-				chans[i] <- struct{}{}
 
+				//wg.Done()
+				chans[len(news)-1] <- struct{}{}
 			}(v, *client, i)
 		} else {
 			go func(v model.NewsContent, client mail.Client, i int) {
+				log.Println("i=", i)
 				<-chans[i-1]
-				err := constructAndSend(v, client)
-				if err != nil {
+
+				if err := constructAndSend(v, client); err != nil {
 					log.Println("有一封邮件发送出错：", err)
 				}
-				wg.Done()
+
+				//wg.Done()
 				chans[i] <- struct{}{}
+
 			}(v, *client, i)
 		}
 	}
 
-	wg.Wait()
-	return nil
+	//wg.Wait()
+	log.Println("阻塞....")
+	<-chans[len(news)-1]
+	log.Println("阻塞结束....")
+
+	log.Println("爬取成功")
+	log.Println("num goroutine: ", runtime.NumGoroutine())
+	os.Exit(0)
+	return
 }
 
 func constructAndSend(v model.NewsContent, client mail.Client) (err error) {
