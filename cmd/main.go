@@ -12,7 +12,6 @@ import (
 	"jwzx-mail/model"
 	"jwzx-mail/util"
 	"log"
-	"os"
 	"runtime"
 )
 
@@ -46,13 +45,6 @@ func main() {
 		chans[i] = make(chan struct{})
 	}
 
-	defer func() {
-		for _, c := range chans {
-			close(c)
-		}
-	}()
-
-	//var wg sync.WaitGroup
 	for i, v := range news {
 		//TODO: 原版非并发，顺序执行
 		//log.Println("爬取消息 -> ", v.Title)
@@ -79,7 +71,7 @@ func main() {
 
 				//wg.Done()
 				chans[i] <- struct{}{}
-
+				close(chans[i])
 			}(v, *client, i)
 		} else if i == len(news)-1 {
 			go func(v model.NewsContent, client mail.Client, i int) {
@@ -90,7 +82,8 @@ func main() {
 				}
 
 				//wg.Done()
-				chans[len(news)-1] <- struct{}{}
+				chans[i] <- struct{}{}
+				close(chans[i])
 			}(v, *client, i)
 		} else {
 			go func(v model.NewsContent, client mail.Client, i int) {
@@ -103,6 +96,7 @@ func main() {
 
 				//wg.Done()
 				chans[i] <- struct{}{}
+				close(chans[i])
 
 			}(v, *client, i)
 		}
@@ -115,7 +109,7 @@ func main() {
 
 	log.Println("爬取成功")
 	log.Println("num goroutine: ", runtime.NumGoroutine())
-	os.Exit(0)
+	//os.Exit(0)
 	return
 }
 

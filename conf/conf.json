@@ -1,11 +1,11 @@
 {
   "http_time_out": 10000000000,
-  "latest_file_id": 10488,
+  "latest_file_id": 10490,
   "send_mail_pool_get": 10,
   "send_mail_to_qqs": [
     "cold-bin@qq.com"
   ],
-  "qq_mail_auth_code": "ovbsqtsywejocjfc",
+  "qq_mail_auth_code": "XXXXXXXXXXXXX",
   "send_mail_server_qq": "cold-bin@qq.com",
   "send_mail_server_host": "smtp.qq.com",
   "send_mail_server_addr": "smtp.qq.com:25",

@@ -38,8 +38,7 @@ var ErrNotTheLatest = errors.New("[jwzx-mail]: not the latest news")
 func GetNewNews() (contents []model.NewsContent, err error) {
 	// 获取第一条信息
 	var first model.ListInside
-	first, err = GetJwzxFirstNews()
-	if err != nil {
+	if first, err = GetJwzxFirstNews(); err != nil {
 		return contents, err
 	}
 
@@ -54,10 +53,10 @@ func GetNewNews() (contents []model.NewsContent, err error) {
 	if err = conf.AConf.UpdateFileId(first.FileId); err != nil {
 		return contents, err
 	}
+
 	// 先获取最新的所有消息
 	var newsList model.ListInsides
-	newsList, err = GetJwzxNewsList(preFileId, conf.AConf.LatestFileId)
-	if err != nil {
+	if newsList, err = GetJwzxNewsList(preFileId, conf.AConf.LatestFileId); err != nil {
 		return contents, err
 	}
 
@@ -66,8 +65,7 @@ func GetNewNews() (contents []model.NewsContent, err error) {
 	contents = make([]model.NewsContent, 0, 20)
 	// 根据文件id，批量请求提取出数据，附件的数据还没有添加上
 	for _, v := range newsList {
-		content, err = GetJwzxContent(v.FileId)
-		if err != nil {
+		if content, err = GetJwzxContent(v.FileId); err != nil {
 			return contents, err
 		}
 		contents = append(contents, content)
@@ -82,21 +80,19 @@ func GetJwzxFirstNews() (first model.ListInside, err error) {
 	url := fmt.Sprintf(NewsListUrl, 1, 1)
 
 	var response *http.Response
-	response, err = util.Get(url)
-	if err != nil {
+
+	if response, err = util.Get(url); err != nil {
 		return first, err
 	}
 	defer response.Body.Close()
 
 	var bytes []byte
-	bytes, err = ioutil.ReadAll(response.Body)
-	if err != nil {
+	if bytes, err = ioutil.ReadAll(response.Body); err != nil {
 		return first, err
 	}
 
 	var s model.ListOutside
-	err = json.Unmarshal(bytes, &s)
-	if err != nil {
+	if err = json.Unmarshal(bytes, &s); err != nil {
 		return first, err
 	}
 
@@ -112,21 +108,18 @@ func GetJwzxNewsList(preFileId, LatestFileId int) (res model.ListInsides, err er
 	url := fmt.Sprintf(NewsListUrl, 1, 20)
 
 	var response *http.Response
-	response, err = util.Get(url)
-	if err != nil {
+	if response, err = util.Get(url); err != nil {
 		return res, err
 	}
 	defer response.Body.Close()
 
 	var bytes []byte
-	bytes, err = ioutil.ReadAll(response.Body)
-	if err != nil {
+	if bytes, err = ioutil.ReadAll(response.Body); err != nil {
 		return res, err
 	}
 
 	var s model.ListOutside
-	err = json.Unmarshal(bytes, &s)
-	if err != nil {
+	if err = json.Unmarshal(bytes, &s); err != nil {
 		return res, err
 	}
 
