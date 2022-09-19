@@ -6,8 +6,8 @@ package model
 import "sort"
 
 type ListOutside struct {
-	TotalPage int          `json:"totalPage"`
-	Data      []ListInside `json:"data"`
+	TotalPage int         `json:"totalPage"`
+	Data      ListInsides `json:"data"`
 }
 
 type ListInside struct {

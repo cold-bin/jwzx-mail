@@ -36,7 +36,7 @@ func (a *AppConf) UpdateFileId(fileId int) error {
 	rwMutex.Lock()
 	defer rwMutex.Unlock()
 
-	// 持久化到配置文件
+	// 持久化到配置文件 /home/coldbin/jwzx-mail/conf/conf.json
 	f1, err := os.OpenFile("../conf/conf.json", os.O_RDWR|os.O_TRUNC, 0666)
 	if err != nil {
 		return err

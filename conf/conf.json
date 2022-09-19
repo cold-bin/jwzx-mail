@@ -1,14 +1,1 @@
-{
-  "http_time_out": 10000000000,
-  "latest_file_id": 10488,
-  "send_mail_pool_get": 4,
-  "send_mail_to_qqs": [
-    "cold-bin@qq.com"
-  ],
-  "qq_mail_auth_code": "owkhanycacyrdabi",
-  "send_mail_server_qq": "cold-bin@qq.com",
-  "send_mail_server_host": "smtp.qq.com",
-  "send_mail_server_addr": "smtp.qq.com:25",
-  "send_mail_from": "教务在线发布新通知 \u003ccold-bin@qq.com\u003e",
-  "send_mail_title_prefix": "教务在线 | "
-}
+{"http_time_out":10000000000,"latest_file_id":10490,"send_mail_pool_get":10,"send_mail_to_qqs":["cold-bin@qq.com"],"qq_mail_auth_code":"ovbsqtsywejocjfc","send_mail_server_qq":"cold-bin@qq.com","send_mail_server_host":"smtp.qq.com","send_mail_server_addr":"smtp.qq.com:25","send_mail_from":"教务在线发布新通知 \u003ccold-bin@qq.com\u003e","send_mail_title_prefix":"教务在线 | "}
