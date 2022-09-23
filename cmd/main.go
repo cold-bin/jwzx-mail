@@ -12,7 +12,9 @@ import (
 	"jwzx-mail/model"
 	"jwzx-mail/util"
 	"log"
+	"os"
 	"runtime"
+	"sync"
 )
 
 func init() {
@@ -39,12 +41,7 @@ func main() {
 	client := mail.NewClient()
 	defer client.EPool.Close()
 
-	chans := make([]chan struct{}, len(news))
-
-	for i := 0; i < len(chans); i++ {
-		chans[i] = make(chan struct{})
-	}
-
+	wg := sync.WaitGroup{}
 	for i, v := range news {
 		//TODO: 原版非并发，顺序执行
 		//log.Println("爬取消息 -> ", v.Title)
@@ -61,7 +58,7 @@ func main() {
 		//if err = client.SendHtmlWithAttachments(e); err != nil {
 		//	 return err
 		//}
-		//wg.Add(1)
+		wg.Add(1)
 		if i == 0 {
 			go func(v model.NewsContent, client mail.Client, i int) {
 				fmt.Println("i=", i)
@@ -69,47 +66,38 @@ func main() {
 					log.Println("有一封邮件发送出错：", err)
 				}
 
-				//wg.Done()
-				chans[i] <- struct{}{}
-				close(chans[i])
+				wg.Done()
 			}(v, *client, i)
-		} else if i == len(news)-1 {
+		} else if i == len(news)-2 {
 			go func(v model.NewsContent, client mail.Client, i int) {
 				fmt.Println("i=", i)
-				<-chans[i-1]
 				if err := constructAndSend(v, client); err != nil {
 					log.Println("有一封邮件发送出错：", err)
 				}
 
-				//wg.Done()
-				chans[i] <- struct{}{}
-				close(chans[i])
+				wg.Done()
+
 			}(v, *client, i)
 		} else {
 			go func(v model.NewsContent, client mail.Client, i int) {
 				log.Println("i=", i)
-				<-chans[i-1]
 
 				if err := constructAndSend(v, client); err != nil {
 					log.Println("有一封邮件发送出错：", err)
 				}
 
-				//wg.Done()
-				chans[i] <- struct{}{}
-				close(chans[i])
-
+				wg.Done()
 			}(v, *client, i)
 		}
 	}
 
-	//wg.Wait()
 	log.Println("阻塞....")
-	<-chans[len(news)-1]
+	wg.Wait()
 	log.Println("阻塞结束....")
 
 	log.Println("爬取成功")
 	log.Println("num goroutine: ", runtime.NumGoroutine())
-	//os.Exit(0)
+	os.Exit(0)
 	return
 }
 

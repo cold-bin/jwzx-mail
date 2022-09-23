@@ -1,6 +1,6 @@
 {
   "http_time_out": 10000000000,
-  "latest_file_id": 10490,
+  "latest_file_id": 10494,
   "send_mail_pool_get": 10,
   "send_mail_to_qqs": [
     "cold-bin@qq.com"

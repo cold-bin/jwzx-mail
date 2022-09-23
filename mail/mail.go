@@ -74,6 +74,7 @@ func PutAttachments(files []model.Attachment, e *email.Email) error {
 	log.Println("	有", len(files), "个附件")
 	for _, f := range files {
 		log.Println("		当前附件: ", f.Name)
+		log.Println("		 附件类型：", f.Header["Content-Type"])
 		attach, err := e.Attach(bytes.NewReader(f.InputStream), f.Name, f.Header["Content-Type"])
 		if err != nil {
 			return err
