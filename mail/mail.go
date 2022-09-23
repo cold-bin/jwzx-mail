@@ -12,6 +12,7 @@ import (
 	"jwzx-mail/conf"
 	"jwzx-mail/model"
 	"log"
+	"mime"
 	"net/smtp"
 	"time"
 )
@@ -74,11 +75,36 @@ func PutAttachments(files []model.Attachment, e *email.Email) error {
 	log.Println("	有", len(files), "个附件")
 	for _, f := range files {
 		log.Println("		当前附件: ", f.Name)
-		log.Println("		 附件类型：", f.Header["Content-Type"])
-		attach, err := e.Attach(bytes.NewReader(f.InputStream), f.Name, f.Header["Content-Type"])
+		//log.Println("		附件Content-Disposition：", f.Header["Content-Disposition"])
+		log.Println("		附件Content-Type：", f.Header["Content-Type"])
+
+		exts, err := mime.ExtensionsByType(f.Header["Content-Type"])
 		if err != nil {
 			return err
 		}
+		log.Println("		", exts)
+
+		if f.Header["Content-Type"] == "application/msword" {
+			exts[0] = ".doc"
+		}
+
+		if f.Header["Content-Type"] == "application/vnd.ms-excel" {
+			exts[0] = ".xls"
+		}
+
+		if f.Header["Content-Type"] == "text/plain" {
+			exts[0] = ".txt"
+		}
+
+		if f.Header["Content-Type"] == "application/vnd.ms-powerpoint" {
+			exts[0] = ".ppt"
+		}
+
+		attach, err := e.Attach(bytes.NewReader(f.InputStream), f.Name+exts[0], f.Header["Content-Type"])
+		if err != nil {
+			return err
+		}
+
 		e.Attachments = append(e.Attachments, attach)
 	}
 
